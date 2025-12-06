@@ -4,6 +4,7 @@
 /node_modules
 /.pnp
 .pnp.*
+.github
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
