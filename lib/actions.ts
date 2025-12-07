@@ -31,6 +31,16 @@ export async function registerAction(values: RegisterSchema) {
       ok: true,
       data: resp,
     };
+    //   const res = await fetch("https://laravel-api.test/regulations", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify(user),
+    //   });
+    //   const result = await res.json();
+    // check if any error in the request
+    //   if (!res.ok)
+    //     return { ok: false, errors: result.errors ?? {}, message: result.message };
+    //   return { ok: true, data: result };
   } catch (error) {
     console.log(error);
     return {

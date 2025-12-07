@@ -1,0 +1,31 @@
+<svg width="260" height="60" viewBox="0 0 260 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Icon -->
+  <rect x="0" y="0" width="60" height="60" rx="12" fill="#569601" />
+
+  <!-- PERFECTLY CENTERED C -->
+  <text
+    x="30"
+    y="30"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    font-family="system-ui, sans-serif"
+    font-size="42"
+    font-weight="700"
+    fill="#FFFFFF"
+  >
+    C
+  </text>
+
+  <!-- Spaced text -->
+  <text
+    x="75"
+    y="38"
+    font-family="system-ui, sans-serif"
+    font-size="22"
+    font-weight="700"
+    letter-spacing="2px"
+    fill="#569601"
+  >
+    Comply Task
+  </text>
+</svg>
