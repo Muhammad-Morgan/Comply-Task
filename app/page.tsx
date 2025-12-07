@@ -12,7 +12,7 @@ export default function Home() {
       <header className="max-w-6xl mx-auto px-4 sm:px-8 py-6 lg:py-3">
         <p className="mb-4 max-w-[550px] leading-loose">
           <span className="block">Hi there ! </span>I am just a cover for the
-          challange. I can take you to the
+          task. I can take you to the
           <Button asChild variant="link" size="sm" className="px-1.5">
             <Link href="/task" className="text-primary">
               challange
