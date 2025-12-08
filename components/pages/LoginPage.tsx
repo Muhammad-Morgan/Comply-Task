@@ -8,7 +8,7 @@ import {
 } from "../molecules/card";
 import { Button } from "../atoms/button";
 import Link from "next/link";
-import { FieldDescription } from "../ui/field";
+import { FieldDescription } from "../atoms/field";
 import LoginForm from "../layouts/LoginForm";
 
 const LoginPage = () => {

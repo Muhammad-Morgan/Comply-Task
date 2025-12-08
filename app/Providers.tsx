@@ -1,7 +1,7 @@
 "use client";
 import ThemeProvider from "@/components/Theme";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { Toaster } from "sonner";
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
@@ -17,6 +17,18 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
         },
       })
   );
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    startTransition(() => {
+      setIsMounted(true);
+    });
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
   return (
     <div>
       <ThemeProvider

@@ -6,18 +6,18 @@ type NavLink = {
 };
 export const links: NavLink[] = [
   {
-    href: "/add-jobs",
-    label: "Add Jobs",
+    href: "/task",
+    label: "Task1",
     icon: <Layers />,
   },
   {
-    href: "/stats",
-    label: "Stats",
+    href: "/task2",
+    label: "Task2",
     icon: <AreaChart />,
   },
   {
-    href: "/jobs",
-    label: "Jobs",
+    href: "/task3",
+    label: "Task3",
     icon: <AppWindow />,
   },
 ];

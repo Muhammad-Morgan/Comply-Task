@@ -6,7 +6,9 @@ export default function layout({
   return (
     <main>
       <Navbar />
-      <div className="py-16 px-4 sm:px-8 lg:px-16">{children}</div>
+      <div className="pt-32 pb-16 w-full max-w-[1100px] mx-auto px-4 sm:px-16 xl:px-0">
+        {children}
+      </div>
     </main>
   );
 }

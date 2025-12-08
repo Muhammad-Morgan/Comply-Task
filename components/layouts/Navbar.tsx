@@ -7,21 +7,29 @@ import { usePathname } from "next/navigation";
 import Logo from "@/assets/logo.svg";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
+import NavSearch from "../organisms/NavSearch";
 const Navbar = () => {
   const pathname = usePathname();
   return (
-    <nav className="bg-muted/70 backdrop-blur-md supports-[backdrop-filter]:bg-muted/50 py-4 sm:px-16 lg:px-24 px-4">
+    <nav className="fixed inset-x-0 top-0 z-50 bg-muted/50 backdrop-blur-md supports-backdrop-filter:bg-muted/30 py-4 sm:px-16 lg:px-24 px-4 shadow-sm">
       <section className="w-full max-w-[1100px] flex items-center justify-between mx-auto">
         <div>
           <LinksDropDown />
-          <Image
-            src={Logo}
-            alt="logo"
-            className="mx-auto hidden lg:block"
-            width={170}
-            height={170}
-          />
+          <Link href="/">
+            <Image
+              src={Logo}
+              alt="logo"
+              className="mx-auto hidden lg:block"
+              width={170}
+              height={170}
+            />
+          </Link>
         </div>
+        <Suspense>
+          <NavSearch />
+        </Suspense>
+
         <div className="hidden lg:flex">
           {links.map((link) => {
             const { href, label, icon } = link;

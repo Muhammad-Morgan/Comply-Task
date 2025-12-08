@@ -9,7 +9,7 @@ import {
 import RegisterForm from "../layouts/RegisterForm";
 import { Button } from "../atoms/button";
 import Link from "next/link";
-import { FieldDescription } from "../ui/field";
+import { FieldDescription } from "../atoms/field";
 
 const RegisterPage = () => {
   return (

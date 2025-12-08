@@ -13,7 +13,7 @@ import { Form } from "../molecules/form";
 import { Button } from "../atoms/button";
 
 import { toast } from "sonner";
-import { FieldDescription } from "../ui/field";
+import { FieldDescription } from "../atoms/field";
 
 const LoginForm = () => {
   const form = useForm<LoginSchema>({

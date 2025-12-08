@@ -4,7 +4,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/atoms/dropdown-menu";
-import { AlignLeft } from "lucide-react";
+import { AlignLeft, HomeIcon } from "lucide-react";
 import { Button } from "@/components/atoms/button";
 import { links } from "@/lib/links";
 import Link from "next/link";
@@ -22,6 +22,11 @@ const LinksDropdown = () => {
         align="start"
         sideOffset={25}
       >
+        <DropdownMenuItem>
+          <Link href="/" className="flex items-center gap-x-2">
+            <HomeIcon /> Home
+          </Link>
+        </DropdownMenuItem>
         {links.map((link) => {
           return (
             <DropdownMenuItem key={link.href}>
