@@ -25,7 +25,36 @@ export async function registerAction(values: RegisterSchema) {
       message: "Server-side validation failed",
     };
   }
-  // submission
+  const apiBaseUrl = process.env.AUTH_API_URL;
+  if (apiBaseUrl) {
+    try {
+      const response = await fetch(
+        `${apiBaseUrl.replace(/\/$/, "")}/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(values),
+          cache: "no-store",
+        }
+      );
+      const result = await response.json().catch(() => null);
+      if (!response.ok) {
+        return {
+          ok: false,
+          errors: result?.errors ?? {},
+          message: result?.message ?? "Registration failed",
+        };
+      }
+      return {
+        ok: true,
+        data: result?.data,
+        message: result?.message ?? "Registered successfully",
+      };
+    } catch (error) {
+      console.error("External registration failed, falling back to DB:", error);
+    }
+  }
+  // submission - DB
   try {
     const user = {
       name: values.name,
@@ -42,16 +71,6 @@ export async function registerAction(values: RegisterSchema) {
       ok: true,
       data: resp,
     };
-    //   const res = await fetch("https://laravel-api.test/regulations", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(user),
-    //   });
-    //   const result = await res.json();
-    // check if any error in the request
-    //   if (!res.ok)
-    //     return { ok: false, errors: result.errors ?? {}, message: result.message };
-    //   return { ok: true, data: result };
   } catch (error) {
     console.log(error);
     return {
@@ -69,6 +88,41 @@ export async function loginAction(values: LoginSchema) {
       errors: fieldErrors,
       message: "Invalid credentials",
     };
+  }
+  const apiBaseUrl = process.env.AUTH_API_URL;
+
+  // prefer external API when provided, fallback to local DB otherwise
+  if (apiBaseUrl) {
+    try {
+      const response = await fetch(`${apiBaseUrl.replace(/\/$/, "")}/login`, {
+        //removes a trailing slash from the end of the URL if it exists
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+        }),
+        cache: "no-store",
+      });
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        return {
+          ok: false,
+          errors: result?.errors ?? {},
+          message: result?.message ?? "Invalid email or password",
+        };
+      }
+
+      return {
+        ok: true,
+        data: result?.data,
+        message: result?.message ?? "logged in successfully",
+        redirectTo: result?.redirectTo ?? "/task1",
+      };
+    } catch (error) {
+      console.error("External auth failed, falling back to DB login:", error);
+    }
   }
   try {
     const existingUser = await prisma.user.findFirst({
@@ -93,19 +147,34 @@ export async function loginAction(values: LoginSchema) {
     };
   }
 }
+
 type GetItemsType = {
   search?: string;
   page?: string;
 };
 export async function getItemsAction({ search, page = "1" }: GetItemsType) {
-  // try {
-  // const resp = await fetch(`https://provideddomain.api?search=${search}&page=${page}`);
-  // rest of logic
-  // return {}
-  // } catch (error) {
-  // console.log(error);
-  //     return null;
-  // }
+  const apiBaseUrl = process.env.ITEMS_API_URL;
+  if (apiBaseUrl) {
+    try {
+      const params = new URLSearchParams();
+      params.set("page", page);
+      if (search) params.set("search", search);
+
+      const response = await fetch(
+        `${apiBaseUrl.replace(/\/$/, "")}?${params.toString()}`,
+        { cache: "no-store" }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch items");
+      }
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.log(error);
+
+      return null;
+    }
+  }
   // dummy return
   return {
     items: [
@@ -146,20 +215,31 @@ export async function getItemsAction({ search, page = "1" }: GetItemsType) {
 export async function getComplianceItems(
   page: string,
   search?: string
-): Promise<{ data: ComplianceItem[]; pageCount: number }> {
-  // how the fetch should look like
-  // const params = new URLSearchParams();
-  // params.set('page', page);
-  // if (search) params.set('search', search);
-  // We should be sending search + page and receiving data + pageCount
-  // const response = await fetch(
-  //   `https://www.domain.com/compliance?${params.toString()}`,
-  //   {
-  //     cache: "no-store",
-  //   }
-  // );
-  // if (!response.ok) throw new Error("Failed to fetch");
-  // const { data, pageCount } = await response.json();
+): Promise<{ data: ComplianceItem[]; pageCount: number } | null> {
+  const apiBaseUrl = process.env.COMPLIANCE_API_URL;
+  if (apiBaseUrl) {
+    try {
+      const params = new URLSearchParams();
+      params.set("page", page);
+      if (search) params.set("search", search);
+
+      const response = await fetch(
+        `${apiBaseUrl.replace(/\/$/, "")}?${params.toString()}`, //removes a trailing slash from the end of the URL if it exists
+        { cache: "no-store" }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch compliance items");
+      }
+
+      const { data, pageCount } = await response.json();
+      return { data, pageCount };
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+  // dummy return
   const data: ComplianceItem[] = [
     { id: "1", name: "Policy A", status: "compliant", jurisdiction: "EU" },
     { id: "2", name: "Policy B", status: "pending", jurisdiction: "US" },

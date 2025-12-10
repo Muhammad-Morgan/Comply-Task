@@ -1,3 +1,4 @@
+// ready for the provided links
 import { AreaChart, Layers, AppWindow, Workflow } from "lucide-react";
 type NavLink = {
   href: string;

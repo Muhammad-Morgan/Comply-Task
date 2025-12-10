@@ -1,3 +1,6 @@
+import type { ReactNode } from "react";
+import Link from "next/link";
+
 import {
   Card,
   CardAction,
@@ -8,21 +11,54 @@ import {
 } from "../atoms/card";
 import RegisterForm from "../layouts/RegisterForm";
 import { Button } from "../atoms/button";
-import Link from "next/link";
 import { FieldDescription } from "../atoms/field";
+import { cn } from "@/lib/utils";
 
-const RegisterPage = () => {
+type RegisterPageProps = {
+  title?: string;
+  description?: string;
+  switchLabel?: string;
+  switchHref?: string;
+  switchCta?: string;
+  termsText?: ReactNode;
+  className?: string;
+};
+
+const defaultTerms = (
+  <>
+    By clicking continue, you agree to our{" "}
+    <a href="#" className="underline">
+      Terms of Service
+    </a>{" "}
+    and{" "}
+    <a href="#" className="underline">
+      Privacy Policy
+    </a>
+    .
+  </>
+);
+
+const RegisterPage = ({
+  title = "Join Us",
+  description = "Enter your info to create a new account, or log in",
+  switchLabel = "Log In",
+  switchHref = "/login",
+  switchCta = "Already have an account?",
+  termsText = defaultTerms,
+  className,
+}: RegisterPageProps) => {
   return (
     <>
-      <Card className="w-full max-w-[450px] mx-auto">
+      <Card className={cn("mx-auto w-full max-w-[450px]", className)}>
         <CardHeader>
-          <CardTitle>Join Us</CardTitle>
-          <CardDescription>
-            Enter your info to create a new account, or log-in
-          </CardDescription>
-          <CardAction>
-            <Button asChild variant="link">
-              <Link href="/login">Log In</Link>
+          <CardTitle>{title}</CardTitle>
+          {description ? (
+            <CardDescription>{description}</CardDescription>
+          ) : null}
+          <CardAction className="text-sm text-muted-foreground">
+            {switchCta}{" "}
+            <Button asChild variant="link" className="px-1">
+              <Link href={switchHref}>{switchLabel}</Link>
             </Button>
           </CardAction>
         </CardHeader>
@@ -30,9 +66,8 @@ const RegisterPage = () => {
           <RegisterForm />
         </CardContent>
       </Card>
-      <FieldDescription className="px-6 text-center max-w-[400px] mx-auto">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+      <FieldDescription className="mx-auto max-w-[450px] px-6 text-center text-muted-foreground">
+        {termsText}
       </FieldDescription>
     </>
   );

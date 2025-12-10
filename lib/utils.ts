@@ -5,6 +5,8 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+// ready for any local data
+// Schemas
 export const registerSchema = z
   .object({
     name: z.string().min(3, "Name must be 3 characters at least"),
@@ -28,3 +30,4 @@ export const loginSchema = z.object({
     .max(32, { error: "Password cannot exceed 32 characters" }),
 });
 export type LoginSchema = z.infer<typeof loginSchema>;
+// for the following schema

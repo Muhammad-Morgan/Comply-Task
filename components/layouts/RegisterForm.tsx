@@ -1,21 +1,18 @@
 "use client";
 
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, type RegisterSchema } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
+import { Button } from "../atoms/button";
+import { Form } from "../atoms/form";
 import {
   CustomInputField,
   CustomPasswordField,
 } from "../organisms/FormComponents";
-import { Button } from "../atoms/button";
-import { Form } from "../atoms/form";
-
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { toast } from "sonner";
-import { registerAction } from "@/lib/actions";
-import { useRouter } from "next/navigation";
+import { registerSchema, type RegisterSchema } from "@/lib/utils";
 
 const RegisterForm = () => {
   const router = useRouter();
@@ -28,33 +25,41 @@ const RegisterForm = () => {
       confirmPassword: "",
     },
   });
-  const queryClient = useQueryClient();
+
   const { mutate, isPending } = useMutation({
-    mutationKey: ["register-user"],
-    mutationFn: (values: RegisterSchema) => registerAction(values),
-    onSuccess: (response) => {
+    mutationFn: async (values: RegisterSchema) => {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const data = await response.json();
       if (!response.ok) {
-        toast.error("There was an error");
-        return;
+        throw new Error(data?.message ?? "Registration failed");
       }
-      toast.success("Registered Successfuly");
-      queryClient.invalidateQueries({ queryKey: ["user"] });
-      router.push("/");
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.message ?? "Registered successfully");
+      router.push("/login");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
     },
   });
 
-  function onSubmit(values: RegisterSchema) {
-    mutate(values);
-  }
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+      <form
+        onSubmit={form.handleSubmit((values) => mutate(values))}
+        className="space-y-5"
+      >
         <CustomInputField name="name" control={form.control} />
         <CustomInputField name="email" control={form.control} />
         <CustomPasswordField name="password" control={form.control} />
         <CustomPasswordField name="confirmPassword" control={form.control} />
-        <Button className="w-full mb-2" type="submit" disabled={isPending}>
-          {isPending ? "loading..." : "Register"}
+        <Button className="mb-2 w-full" type="submit" disabled={isPending}>
+          {isPending ? "Registering..." : "Register"}
         </Button>
       </form>
     </Form>
