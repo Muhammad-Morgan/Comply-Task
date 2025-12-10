@@ -1,11 +1,13 @@
-import { type Control, FieldValues, Path } from "react-hook-form";
+import * as React from "react";
+import { type FieldValues } from "react-hook-form";
 import {
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "../molecules/form";
+} from "../atoms/form";
 import { Input } from "../atoms/input";
 import {
   Select,
@@ -14,59 +16,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../atoms/select";
-// Types of input filed
-type CustomInputFieldProps<T extends FieldValues> = {
-  name: Path<T>;
-  control: Control<T>;
+import { CustomInputFieldProps, CustomSelectFieldProps } from "@/lib/types";
+import { Button } from "../atoms/button";
+
+type BaseFieldProps<T extends FieldValues> = CustomInputFieldProps<T> & {
+  label?: string;
+  description?: React.ReactNode;
 };
 
-export function CustomPasswordField<T extends FieldValues>({
-  control,
-  name,
-}: CustomInputFieldProps<T>) {
-  return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel className="capitalize">{name}</FormLabel>
-          <FormControl>
-            <Input {...field} type="password" />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  );
-}
 export function CustomInputField<T extends FieldValues>({
   control,
   name,
-}: CustomInputFieldProps<T>) {
+  label,
+  description,
+}: BaseFieldProps<T>) {
+  const [visible, setVisible] = React.useState(false);
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="capitalize">{name}</FormLabel>
+          <FormLabel className="capitalize">{label ?? name}</FormLabel>
+          {description ? (
+            <FormDescription>{description}</FormDescription>
+          ) : null}
           <FormControl>
-            <Input {...field} />
+            <Input {...field} type={visible ? "text" : "password"} />
           </FormControl>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setVisible((prev) => !prev)}
+            className="mt-1"
+          >
+            {visible ? "Hide" : "Show"} password
+          </Button>
           <FormMessage />
         </FormItem>
       )}
     />
   );
 }
-// Types for select field
-type CustomSelectFieldProps<T extends FieldValues> = {
-  name: Path<T>;
-  control: Control<T>;
-  items: string[];
-  labelText: string;
-};
+
 export function CustomSelectField<T extends FieldValues>({
   name,
   control,

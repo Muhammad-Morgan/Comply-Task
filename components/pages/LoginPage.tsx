@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../molecules/card";
+} from "../atoms/card";
 import { Button } from "../atoms/button";
 import Link from "next/link";
 import { FieldDescription } from "../atoms/field";

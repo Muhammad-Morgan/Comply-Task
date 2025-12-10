@@ -9,7 +9,7 @@ import {
   CustomPasswordField,
 } from "../organisms/FormComponents";
 import { Button } from "../atoms/button";
-import { Form } from "../molecules/form";
+import { Form } from "../atoms/form";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -30,6 +30,7 @@ const RegisterForm = () => {
   });
   const queryClient = useQueryClient();
   const { mutate, isPending } = useMutation({
+    mutationKey: ["register-user"],
     mutationFn: (values: RegisterSchema) => registerAction(values),
     onSuccess: (response) => {
       if (!response.ok) {

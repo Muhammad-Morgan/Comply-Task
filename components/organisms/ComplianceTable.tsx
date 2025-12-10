@@ -8,102 +8,140 @@ import {
   TableRow,
 } from "@/components/atoms/table";
 import { Button } from "@/components/atoms/button";
-export type Column<T> = {
-  key: keyof T;
-  header: string;
-  render?: (row: T) => React.ReactNode;
+import { ComplianceTableProps } from "@/lib/types";
+import { cn } from "@/lib/utils";
+type ComplianceTableExtras = {
+  emptyState?: React.ReactNode;
+  caption?: string;
+  stickyHeader?: boolean;
+  paginated?: boolean;
+  previousLabel?: string;
+  nextLabel?: string;
+  paginationClassName?: string;
+  footer?: React.ReactNode;
 };
-type ComplianceTableProps<T> = {
-  columns: Column<T>[];
-  data: T[];
-  page: number;
-  pageCount: number;
-  onPageChange?: (page: number) => void;
-  onRowSelect?: (row: T) => void;
-};
-
 function ComplianceTable<T extends { id: string | number }>({
   columns,
-  data,
-  page,
-  pageCount,
+  data = [],
+  page = 1,
+  pageCount = 1,
   onPageChange,
   onRowSelect,
-}: ComplianceTableProps<T>) {
+  emptyState,
+  caption,
+  stickyHeader = false,
+  paginated = true,
+  previousLabel = "Previous",
+  nextLabel = "Next",
+  paginationClassName,
+  footer,
+}: ComplianceTableProps<T> & ComplianceTableExtras) {
+  const hasRows = data.length > 0;
   return (
-    <div className="space-y-4">
+    <div
+      className="space-y-4"
+      role="region"
+      aria-label={caption ?? "Compliance table"}
+    >
       <div className="overflow-x-auto border rounded-md bg-card">
         <Table>
-          <TableHeader>
+          {caption ? <caption className="sr-only">{caption}</caption> : null}
+          <TableHeader
+            className={stickyHeader ? "sticky top-0 bg-card" : undefined}
+          >
             <TableRow>
               {columns.map((column) => {
                 return (
-                  <TableHead key={String(column.key)}>
-                    {column.header}{" "}
+                  <TableHead
+                    key={String(column.key)}
+                    scope="col"
+                    className="text-muted-foreground font-semibold"
+                  >
+                    {column.header}
                   </TableHead>
                 );
               })}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.length === 0 ? (
+            {hasRows ? (
+              data.map((item) => (
+                <TableRow
+                  key={String(item.id)}
+                  tabIndex={onRowSelect ? 0 : -1}
+                  onClick={onRowSelect ? () => onRowSelect(item) : undefined}
+                  onKeyDown={
+                    onRowSelect
+                      ? (event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            onRowSelect(item);
+                          }
+                        }
+                      : undefined
+                  }
+                  className={
+                    onRowSelect
+                      ? "cursor-pointer focus-visible:ring-2 focus-visible:ring-ring"
+                      : undefined
+                  }
+                >
+                  {columns.map((col) => (
+                    <TableCell key={String(col.key)}>
+                      {col.render
+                        ? col.render(item)
+                        : String(item[col.key] ?? "")}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
                   className="text-center text-muted-foreground"
                 >
-                  No records found.
+                  {emptyState ?? "No records found."}
                 </TableCell>
               </TableRow>
-            ) : (
-              data?.map((item) => (
-                <TableRow
-                  key={String(item.id)}
-                  tabIndex={0} // click or Enter/Space = select row
-                  onClick={() => onRowSelect?.(item)}
-                  onKeyDown={(e) => {
-                    if ((e.key === "Enter" || e.key === " ") && onRowSelect) {
-                      e.preventDefault();
-                      onRowSelect(item);
-                    }
-                  }}
-                  className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  {columns.map((col) => (
-                    <TableCell key={String(col.key)}>
-                      {col.render ? col.render(item) : String(item[col.key])}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
             )}
           </TableBody>
         </Table>
       </div>
-      {/* Simple pagination controls */}
-      <div className="flex items-center justify-between gap-4 text-sm">
-        <span className="text-muted-foreground">
-          Page {page} of {pageCount}
-        </span>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page <= 1 || !onPageChange}
-            onClick={() => onPageChange?.(page - 1)}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={page >= pageCount || !onPageChange}
-            onClick={() => onPageChange?.(page + 1)}
-          >
-            Next
-          </Button>
+      {footer}
+      {/* Simple pagination control if required */}
+      {paginated && (
+        <div
+          className={cn(
+            "mt-2 flex items-center justify-between gap-4 text-sm",
+            paginationClassName
+          )}
+          role="navigation"
+          aria-label="Table pagination"
+        >
+          <span className="text-muted-foreground">
+            Page {page} of {pageCount}
+          </span>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1 || !onPageChange}
+              onClick={() => onPageChange?.(page - 1)}
+            >
+              {previousLabel}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= pageCount || !onPageChange}
+              onClick={() => onPageChange?.(page + 1)}
+            >
+              {nextLabel}
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

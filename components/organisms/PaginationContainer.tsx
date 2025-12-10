@@ -2,17 +2,9 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../atoms/button";
-type ButtonContainerProps = {
-  currentPage: number;
-  totalPages: number;
-};
+import { ButtonContainerProps, ButtonProps } from "@/lib/types";
 
-type ButtonProps = {
-  page: number;
-  activeClass: boolean;
-};
-
-const PaginationContainerComplex = ({
+const PaginationContainer = ({
   currentPage,
   totalPages,
 }: ButtonContainerProps) => {
@@ -55,7 +47,14 @@ const PaginationContainerComplex = ({
 
     if (currentPage > 3) {
       pageButtons.push(
-        <Button size="icon" variant="outline" key="dots-1">
+        <Button
+          size="icon"
+          variant="outline"
+          key="dots-left"
+          disabled
+          aria-hidden="true"
+          tabIndex={-1}
+        >
           ...
         </Button>
       );
@@ -90,7 +89,14 @@ const PaginationContainerComplex = ({
     }
     if (currentPage < totalPages - 2) {
       pageButtons.push(
-        <Button size="icon" variant="outline" key="dots-1">
+        <Button
+          size="icon"
+          variant="outline"
+          key="dots-right"
+          disabled
+          aria-hidden="true"
+          tabIndex={-1}
+        >
           ...
         </Button>
       );
@@ -138,4 +144,4 @@ const PaginationContainerComplex = ({
   );
 };
 
-export default PaginationContainerComplex;
+export default PaginationContainer;

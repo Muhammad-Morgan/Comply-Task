@@ -9,7 +9,7 @@ import {
   CustomInputField,
   CustomPasswordField,
 } from "../organisms/FormComponents";
-import { Form } from "../molecules/form";
+import { Form } from "../atoms/form";
 import { Button } from "../atoms/button";
 
 import { toast } from "sonner";

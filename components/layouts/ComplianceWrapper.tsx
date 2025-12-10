@@ -1,15 +1,10 @@
 import * as React from "react";
-import { useRouter } from "next/navigation";
-import ComplianceTable, { Column } from "../organisms/ComplianceTable";
+import { useRouter, useSearchParams } from "next/navigation";
+import ComplianceTable from "../organisms/ComplianceTable";
 import { type ComplianceItem } from "@/lib/actions";
-import { useSearchParams } from "next/navigation";
 import { Input } from "../atoms/input";
-type Props = {
-  initialData: ComplianceItem[];
-  page: number;
-  pageCount: number;
-  initialSearch: string;
-};
+import { Column, Props as ComplianceWrapperProps } from "@/lib/types";
+
 // simple generic debounce function
 function useDebouncedValue<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = React.useState(value);
@@ -22,32 +17,53 @@ function useDebouncedValue<T>(value: T, delay: number): T {
   return debounced;
 }
 
+type ComplianceWrapperExtra = {
+  columns?: Column<ComplianceItem>[];
+  onRowSelect?: (row: ComplianceItem) => void;
+  searchPlaceholder?: string;
+  searchLabel?: string;
+  debounceMs?: number;
+  className?: string;
+  searchClassName?: string;
+};
+
+const defaultColumns: Column<ComplianceItem>[] = [
+  { key: "name", header: "Name" },
+  { key: "status", header: "Status" },
+  { key: "jurisdiction", header: "Jurisdiction" },
+];
+
 const ComplianceWrapper = ({
   initialData,
   page,
   pageCount,
   initialSearch = "",
-}: Props) => {
+  status = "idle",
+  statusMessage = "Loading Result",
+  columns = defaultColumns,
+  onRowSelect,
+  searchPlaceholder = "Search by name…",
+  searchLabel = "Search compliance items",
+  debounceMs = 300,
+  className = "",
+  searchClassName = "",
+}: ComplianceWrapperProps & ComplianceWrapperExtra) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [search, setSearch] = React.useState(initialSearch);
-  const debouncedSearch = useDebouncedValue(search, 300);
+  const debouncedSearch = useDebouncedValue(search, debounceMs);
   const prevSearchRef = React.useRef(debouncedSearch);
-
-  const columns: Column<ComplianceItem>[] = [
-    { key: "name", header: "Name" },
-    { key: "status", header: "Status" },
-    { key: "jurisdiction", header: "Jurisdiction" },
-  ] as const;
+  // memoizing the input to avoid unnessecary re-renders
   const updateQuery = React.useCallback(
-    (pageValue: number) => {
+    (nextPage: number, nextSearch = debouncedSearch) => {
       const params = new URLSearchParams(searchParams.toString());
       // adding next page
-      params.set("page", String(pageValue));
-      if (debouncedSearch) params.set("search", debouncedSearch);
+      params.set("page", String(nextPage));
+      // adding search query if exists
+      if (nextSearch) params.set("search", nextSearch);
       else params.delete("search");
-      // navigate to the new url
+      // navigate to the new url after checking that the new constructed url doesn't match the old one
       const next = `?${params.toString()}`;
       const current = `?${searchParams.toString()}`;
       if (next !== current) {
@@ -57,36 +73,46 @@ const ComplianceWrapper = ({
     [debouncedSearch, router, searchParams]
   );
 
-  const handlePageChange = (nextPage: number) => {
-    updateQuery(nextPage);
-  };
   // reseting to page 1 after search changes
   React.useEffect(() => {
     if (prevSearchRef.current === debouncedSearch) return;
     prevSearchRef.current = debouncedSearch;
-    updateQuery(1);
+    updateQuery(1, debouncedSearch);
   }, [debouncedSearch, updateQuery]);
 
+  const handlePageChange = (nextPage: number) => {
+    updateQuery(nextPage);
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-2">
-        <label className="flex-1 text-sm">
-          <span className="sr-only">Search compliance items</span>
-          <Input
-            placeholder="Search by name..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full"
-          />
+    <div className={className}>
+      <form
+        className={searchClassName}
+        aria-label={searchLabel}
+        onSubmit={(event) => event.preventDefault()}
+      >
+        <label className="sr-only" htmlFor="compliance-search">
+          {searchLabel}
         </label>
-      </div>
+        <Input
+          id="compliance-search"
+          placeholder={searchPlaceholder}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </form>
+      {status === "loading" && (
+        <div role="status" className="text-sm text-muted-foreground">
+          {statusMessage}
+        </div>
+      )}
       <ComplianceTable<ComplianceItem>
         columns={columns}
         onPageChange={handlePageChange}
         data={initialData}
         page={page}
         pageCount={pageCount}
-        onRowSelect={(item) => console.log(item.id)}
+        onRowSelect={onRowSelect}
       />
     </div>
   );

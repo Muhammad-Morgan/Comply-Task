@@ -1,7 +1,12 @@
 "use server";
 import z from "zod";
 import prisma from "./db";
-import { RegisterSchema, LoginSchema, registerSchema } from "./utils";
+import {
+  RegisterSchema,
+  LoginSchema,
+  registerSchema,
+  loginSchema,
+} from "./utils";
 // ComplianceItemType
 export type ComplianceItem = {
   id: string;
@@ -56,8 +61,37 @@ export async function registerAction(values: RegisterSchema) {
   }
 }
 export async function loginAction(values: LoginSchema) {
-  // validation
-  // submission
+  const parsed = loginSchema.safeParse(values);
+  if (!parsed.success) {
+    const { fieldErrors } = z.flattenError(parsed.error);
+    return {
+      ok: false,
+      errors: fieldErrors,
+      message: "Invalid credentials",
+    };
+  }
+  try {
+    const existingUser = await prisma.user.findFirst({
+      where: { email: values.email },
+    });
+    if (!existingUser || existingUser.password !== values.password) {
+      return {
+        ok: false,
+        message: "Invalid email or password",
+      };
+    }
+    return {
+      ok: true,
+      message: "logged in successfully",
+      redirectTo: "/task1",
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      ok: false,
+      message: "internal server error",
+    };
+  }
 }
 type GetItemsType = {
   search?: string;
