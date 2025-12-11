@@ -8,10 +8,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../atoms/card";
+} from "../ui/card";
 import RegisterForm from "../layouts/RegisterForm";
-import { Button } from "../atoms/button";
-import { FieldDescription } from "../atoms/field";
+import { Button } from "../ui/button";
+import { FieldDescription } from "../ui/field";
 import { cn } from "@/lib/utils";
 
 type RegisterPageProps = {

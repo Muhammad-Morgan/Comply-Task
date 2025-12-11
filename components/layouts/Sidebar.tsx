@@ -6,9 +6,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import Logo from "@/assets/logo.svg";
-import { links as defaultLinks } from "@/lib/links";
+import { links as defaultLinks } from "@/lib/lists";
 import { cn } from "@/lib/utils";
-import { Button } from "../atoms/button";
+import { Button } from "../ui/button";
 
 type SidebarLink = {
   href: string;

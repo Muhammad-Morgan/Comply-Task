@@ -1,7 +1,7 @@
 "use client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "../atoms/button";
+import { Button } from "../ui/button";
 import { ButtonContainerProps, ButtonProps } from "@/lib/types";
 
 const PaginationContainer = ({

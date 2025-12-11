@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { AlignLeft, HomeIcon } from "lucide-react";
 
-import { Button } from "@/components/atoms/button";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/atoms/dropdown-menu";
-import { links as defaultLinks } from "@/lib/links";
+} from "@/components/ui/dropdown-menu";
+import { links as defaultLinks } from "@/lib/lists";
 type NavLink = {
   href: string;
   label: string;
@@ -16,7 +16,7 @@ type NavLink = {
 };
 type LinksDropDownProps = {
   links?: NavLink[];
-  homeLabel: string;
+  homeLabel?: string;
   trigger?: React.ReactNode;
   triggerLabel?: string;
   className?: string;

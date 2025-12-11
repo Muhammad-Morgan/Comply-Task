@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Button } from "../atoms/button";
-import { Form } from "../atoms/form";
+import { Button } from "../ui/button";
+import { Form } from "../ui/form";
 import {
   CustomInputField,
   CustomPasswordField,

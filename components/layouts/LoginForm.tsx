@@ -5,13 +5,10 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { Button } from "../atoms/button";
-import { FieldDescription } from "../atoms/field";
-import { Form } from "../atoms/form";
-import {
-  CustomInputField,
-  CustomPasswordField,
-} from "../organisms/FormComponents";
+import { Button } from "../ui/button";
+import { FieldDescription } from "../ui/field";
+import { Form } from "../ui/form";
+import { CustomInputField } from "../organisms/FormComponents";
 import { loginSchema, type LoginSchema } from "@/lib/utils";
 
 const LoginForm = () => {
@@ -54,12 +51,20 @@ const LoginForm = () => {
         className="space-y-8"
         onSubmit={form.handleSubmit((values) => mutate(values))}
       >
-        <CustomInputField name="email" control={form.control} />
+        <CustomInputField
+          type="email"
+          name="email"
+          control={form.control}
+          placeholder="a7a"
+        />
         <FieldDescription className="-mt-4 ml-1">
-          We&apos;ll use this to contact you. We will not share your email with
-          anyone else.
+          We will never share your email.
         </FieldDescription>
-        <CustomPasswordField name="password" control={form.control} />
+        <CustomInputField
+          type="password"
+          name="password"
+          control={form.control}
+        />
         <Button className="mb-2 w-full" type="submit" disabled={isPending}>
           {isPending ? "Logging in..." : "Log In"}
         </Button>

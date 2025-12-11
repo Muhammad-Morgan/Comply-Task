@@ -5,7 +5,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import { useState, useEffect, startTransition, type FormEvent } from "react";
-import { Input } from "../atoms/input";
+import { Input } from "../ui/input";
 import { cn } from "@/lib/utils";
 
 type NavSearchProps = {

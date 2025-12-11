@@ -32,28 +32,36 @@ This repository contains a Next.js application built with the App Router. The ap
 - **Compliance table** – Generic table component with pagination and client search. `getComplianceItems` can read from `COMPLIANCE_API_URL` or fall back to mocked data.
 - **Items list** – Pagination, cards, and inline actions (feature/delete) using reusable card+modal components. Fetching is powered by `getItemsAction`, which optionally hits `ITEMS_API_URL`.
 - **Reusable UI** – Navigation, dropdowns, modals, forms, and filters follow atomic design and can be slotted anywhere.
+- **Countries search** – `/api/countries` streams paginated country data to the front-end. The `useCountries` hook debounces queries, fetches via React Query, and pipes results into the async select with infinite scroll.
 
 ## Project Layout
 
 ```
 app/
  ├─ api/
+ │   ├─ countries/route.ts
  │   ├─ login/route.ts
  │   └─ register/route.ts
- ├─ login/
- ├─ register/
+ ├─ login/page.tsx
+ ├─ register/page.tsx
  ├─ Providers.tsx
+ ├─ layout.tsx
  └─ page.tsx
 components/
- ├─ atoms/
- ├─ molecules/
- ├─ organisms/
- └─ layouts/
+ ├─ atoms/            # primitive inputs, buttons, helpers
+ ├─ molecules/        # composed widgets (selects, cards, etc.)
+ ├─ organisms/        # larger sections (tables, filters, modals…)
+ ├─ layouts/          # multi-step forms, wrappers
+ ├─ pages/            # stepper wizard steps + marketing pages
+ ├─ ui/               # shadcn/ui primitives
+ └─ __tests__/        # component-level tests
 lib/
  ├─ actions.ts        # server actions + API fallbacks
- ├─ links.tsx
+ ├─ db.ts
+ ├─ hooks/            # react-query / async hooks
+ ├─ lists.tsx
  ├─ types.ts
- └─ utils.ts
+ └─ utils.ts          # validation schemas, helpers
 ```
 
 ## Environment Variables
@@ -94,7 +102,19 @@ npm run test:watch
 
 - **POST /api/login** – Forwards to `loginAction`, returning `{ ok, message, redirectTo? }`.
 - **POST /api/register** – Forwards to `registerAction`, returning `{ ok, message }`.
+- **GET /api/countries** – Accepts `?q` and `?cursor` params, proxies a lightweight dataset, and returns paginated `{ options, nextCursor }` to power the async select experience without exposing third-party keys.
 - Server actions automatically use Prisma or upstream APIs depending on the env vars mentioned above.
+
+## Component Cheat Sheet
+
+- **ChallangeLayout** – Orchestrates the multi-step wizard, maintains shared form state, and controls step transitions/validation. It also handles the global reset when the success modal confirms.
+- **FirstPage** – Captures personal info (name/email/gender/country/age) via react-hook-form and zod; wires the gender and country cards while keeping all fields controlled.
+- **SecondPage** – Hosts the category dropdown, interests multi-select, and avatar uploader; each widget syncs directly with the form’s `preferencesSchema`.
+- **SubmitPage** – Renders the summary table, the readiness widget, and wires the submit button to open the success modal while forwarding the collected key/value pairs.
+- **CategorySearchSelect** – Front-end searchable dropdown that filters static options, handles keyboard toggling, and communicates selection back up through controlled props.
+- **InterestsMultiSelect** – Async-feel multi-select with loading shimmer, removable chips, and a hard cap (5) enforced in both UI and validation.
+- **ButtonWithIcon** – Convenience wrapper around `<ComplyButtons>` to keep icon/button spacing, focus styles, and CTA sizes consistent across steps.
+- **SuccessModalDialog** – Accessible dialog with focus trap, keyboard support, and optional summary rows so the user can review entries before resetting the wizard.
 
 ## Development Notes
 
@@ -105,4 +125,4 @@ npm run test:watch
 
 ---
 
-Happy building! Add more docs or examples as the app evolves.
+Happy building! Add more docs or examples as the app evolves. Note: there are a few unrelated demo components in the repo that were left intentionally for illustration/reference.

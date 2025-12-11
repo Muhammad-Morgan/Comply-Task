@@ -8,9 +8,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/atoms/card";
-import { Button } from "../atoms/button";
-import { Separator } from "../atoms/separator";
+} from "@/components/ui/card";
+import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 
 type CardAction =
   | {

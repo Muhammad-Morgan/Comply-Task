@@ -6,8 +6,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/atoms/table";
-import { Button } from "@/components/atoms/button";
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { ComplianceTableProps } from "@/lib/types";
 import { cn } from "@/lib/utils";
 type ComplianceTableExtras = {

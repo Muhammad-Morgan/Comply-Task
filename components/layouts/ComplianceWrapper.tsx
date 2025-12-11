@@ -2,7 +2,7 @@ import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ComplianceTable from "../organisms/ComplianceTable";
 import { type ComplianceItem } from "@/lib/actions";
-import { Input } from "../atoms/input";
+import { Input } from "../ui/input";
 import { Column, Props as ComplianceWrapperProps } from "@/lib/types";
 
 // simple generic debounce function

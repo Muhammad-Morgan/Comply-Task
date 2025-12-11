@@ -8,6 +8,11 @@ import ItemCard from "../organisms/ItemCard";
 import Modal from "../organisms/Modal";
 import PaginationContainerComplex from "../organisms/PaginationContainer";
 
+type ItemSummary = {
+  id: string;
+  item: string;
+};
+
 const ItemsList = () => {
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
@@ -19,7 +24,7 @@ const ItemsList = () => {
     queryFn: () => getItemsAction({ search, page: pageNumber }),
   });
   // response shape
-  const items = data?.items ?? [];
+  const items: ItemSummary[] = data?.items ?? [];
   const page = data?.page ?? 1;
   const totalPages = data?.totalPages ?? 0;
 
@@ -46,7 +51,7 @@ const ItemsList = () => {
         ) : null}
       </div>
       <div className="grid gap-8 md:grid-cols-2">
-        {items.map(({ id, item }) => (
+        {items.map(({ id, item }: ItemSummary) => (
           <ItemCard
             key={id}
             title={item}

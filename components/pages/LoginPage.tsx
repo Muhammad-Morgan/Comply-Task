@@ -8,9 +8,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../atoms/card";
-import { Button } from "../atoms/button";
-import { FieldDescription } from "../atoms/field";
+} from "../ui/card";
+import { Button } from "../ui/button";
+import { FieldDescription } from "../ui/field";
 import LoginForm from "../layouts/LoginForm";
 import { cn } from "@/lib/utils";
 

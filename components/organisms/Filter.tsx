@@ -2,15 +2,16 @@
 import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-import { Button } from "../atoms/button";
-import { Input } from "../atoms/input";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from "../atoms/select";
+} from "../ui/select";
+import { cn } from "@/lib/utils";
 
 type FilterControl =
   | {
@@ -29,16 +30,48 @@ type FilterControl =
       defaultValue?: string;
     };
 
+type SearchParamsLike = Pick<
+  ReturnType<typeof useSearchParams>,
+  "get" | "toString"
+>;
+
 type FilterProps = {
   controls: FilterControl[];
   formLabel?: string;
   className?: string;
 };
 
-const Filter = ({ controls, formLabel = "Filter items" }: FilterProps) => {
+type FilterViewProps = FilterProps & {
+  router: Pick<ReturnType<typeof useRouter>, "push">;
+  pathname: string;
+  searchParams: SearchParamsLike;
+};
+
+const Filter = ({ controls, formLabel = "Filter items", className }: FilterProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  return (
+    <FilterView
+      controls={controls}
+      formLabel={formLabel}
+      className={className}
+      router={router}
+      pathname={pathname}
+      searchParams={searchParams}
+    />
+  );
+};
+
+export function FilterView({
+  controls,
+  formLabel = "Filter items",
+  className,
+  router,
+  pathname,
+  searchParams,
+}: FilterViewProps) {
 
   const [values, setValues] = React.useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
@@ -83,49 +116,64 @@ const Filter = ({ controls, formLabel = "Filter items" }: FilterProps) => {
     <form
       role="search"
       aria-label={formLabel}
-      className="bg-muted mb-16 p-8 grid sm:grid-cols-2 md:grid-cols-3 gap-4 rounded-lg"
+      className={cn("mb-16", className)}
       onSubmit={handleSubmit}
     >
-      {controls.map((control) => {
-        if (control.type === "text") {
-          // Either Input return
+      <fieldset className="grid gap-4 rounded-lg bg-muted p-8 sm:grid-cols-2 md:grid-cols-3">
+        <legend className="sr-only">{formLabel}</legend>
+        {controls.map((control) => {
+          if (control.type === "text") {
+            // Text input path
+            return (
+              <div key={control.name} className="flex flex-col gap-1">
+                <label className="text-sm font-medium" htmlFor={control.name}>
+                  {control.label}
+                </label>
+                <Input
+                  id={control.name}
+                  name={control.name}
+                  placeholder={control.placeholder}
+                  value={values[control.name]}
+                  onChange={(e) => updateValue(control.name, e.target.value)}
+                />
+              </div>
+            );
+          }
           return (
-            <div key={control.name}>
-              <label htmlFor={control.name}>{control.label}</label>
-              <Input
-                id={control.name}
-                name={control.name}
-                placeholder={control.placeholder}
+            // Select path
+            <div key={control.name} className="flex flex-col gap-1">
+              <label className="text-sm font-medium" htmlFor={control.name}>
+                {control.label}
+              </label>
+              <Select
                 value={values[control.name]}
-                onChange={(e) => updateValue(control.name, e.target.value)}
-              />
+                onValueChange={(value) => updateValue(control.name, value)}
+              >
+                <SelectTrigger id={control.name}>
+                  <SelectValue placeholder={control.placeholder} />
+                </SelectTrigger>
+                <SelectContent>
+                  {control.options.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           );
-        }
-        return (
-          // Or select return
-          <div key={control.name}>
-            <label htmlFor={control.name}>{control.label}</label>
-            <Select
-              value={values[control.name]}
-              onValueChange={(value) => updateValue(control.name, value)}
-            >
-              <SelectTrigger id={control.name}>
-                <SelectValue placeholder={control.placeholder} />
-              </SelectTrigger>
-              <SelectContent>
-                {control.options.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        );
-      })}
+        })}
 
-      <Button type="submit">Search</Button>
+        <div className="flex items-end">
+          <Button
+            type="submit"
+            className="w-full"
+            aria-label="Apply selected filters"
+          >
+            Search
+          </Button>
+        </div>
+      </fieldset>
     </form>
   );
 };

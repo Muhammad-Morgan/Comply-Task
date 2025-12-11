@@ -1,5 +1,5 @@
 import { useEffect, useRef, useId, type ReactNode } from "react";
-import { Button } from "../atoms/button";
+import { Button } from "../ui/button";
 
 type DialogProps = {
   open: boolean;

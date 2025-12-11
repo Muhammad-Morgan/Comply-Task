@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Button } from "../atoms/button";
+import { Button } from "../ui/button";
 import ConfirmDeleteDialog from "../molecules/ConfirmDeleteDialog";
 
 type ModalProps = {
